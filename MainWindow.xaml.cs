@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 using KnockingTool.Models;
 using KnockingTool.Services;
 using Microsoft.Win32;
@@ -43,6 +45,12 @@ public partial class MainWindow : Window
         UpdateThemeToggleButton();
         Log("برنامه آماده است.");
         Log($"ذخیره خودکار: {_persistence.ConfigPath}");
+    }
+
+    private void CopyrightLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+    {
+        Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        e.Handled = true;
     }
 
     protected override void OnClosed(EventArgs e)
