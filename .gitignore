@@ -3,6 +3,7 @@ bin/
 obj/
 publish/
 publish-*/
+release/
 
 # Scripts build artifacts
 scripts/bin/
