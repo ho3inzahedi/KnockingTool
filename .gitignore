@@ -1,0 +1,20 @@
+# Build outputs
+bin/
+obj/
+publish/
+publish-*/
+
+# Scripts build artifacts
+scripts/bin/
+scripts/obj/
+
+# IDE / OS
+.vs/
+.vscode/
+*.user
+*.suo
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
