@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Navigation;
 using KnockingTool.Models;
 using KnockingTool.Services;
 using Microsoft.Win32;
@@ -47,9 +46,9 @@ public partial class MainWindow : Window
         Log($"ذخیره خودکار: {_persistence.ConfigPath}");
     }
 
-    private void CopyrightLink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+    private void CopyrightLink_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo("https://github.com/ho3inzahedi/KnockingTool") { UseShellExecute = true });
         e.Handled = true;
     }
 

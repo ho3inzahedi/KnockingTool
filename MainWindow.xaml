@@ -366,16 +366,14 @@
         <Border Grid.Row="4"
                 Background="{DynamicResource AppBackgroundBrush}"
                 Padding="0,0,0,10">
-            <TextBlock FontSize="10"
+            <TextBlock Text="Design and Development by Hossein Zahedi"
+                       FontSize="10"
+                       Foreground="{DynamicResource TextSecondaryBrush}"
                        HorizontalAlignment="Center"
-                       Opacity="0.75">
-                <Hyperlink NavigateUri="https://github.com/ho3inzahedi/KnockingTool"
-                           RequestNavigate="CopyrightLink_RequestNavigate"
-                           Foreground="{DynamicResource TextSecondaryBrush}"
-                           TextDecorations="None">
-                    Design and Development by Hossein Zahedi
-                </Hyperlink>
-            </TextBlock>
+                       Opacity="0.75"
+                       Cursor="Hand"
+                       TextDecorations="Underline"
+                       MouseLeftButtonUp="CopyrightLink_Click" />
         </Border>
     </Grid>
 </Window>
