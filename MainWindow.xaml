@@ -64,9 +64,6 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Border Background="#22FFFFFF" CornerRadius="10" Padding="12,8" Margin="0,0,12,0">
-                        <TextBlock Text="نیاز به Administrator" Foreground="White" FontSize="12" />
-                    </Border>
                     <Button x:Name="ThemeToggleButton"
                             Style="{StaticResource IconButton}"
                             Content="🌙"
