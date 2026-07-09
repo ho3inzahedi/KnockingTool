@@ -34,6 +34,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" MinHeight="260" />
             <RowDefinition Height="160" MinHeight="120" />
             <RowDefinition Height="Auto" />
@@ -78,8 +79,64 @@
             </Grid>
         </Border>
 
+        <!-- Update banner -->
+        <Border x:Name="UpdateBanner"
+                Grid.Row="1"
+                Visibility="Collapsed"
+                Background="{DynamicResource AccentBrush}"
+                Padding="20,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="UpdateBannerTitle"
+                               Text="نسخه جدید در دسترس است"
+                               FontWeight="SemiBold"
+                               FontSize="14"
+                               Foreground="White" />
+                    <TextBlock x:Name="UpdateBannerSubtitle"
+                               FontSize="12"
+                               Foreground="#E0E7FF"
+                               Margin="0,4,0,0"
+                               TextWrapping="Wrap" />
+                    <ProgressBar x:Name="UpdateProgressBar"
+                                   Height="6"
+                                   Margin="0,8,24,0"
+                                   Visibility="Collapsed"
+                                   Minimum="0"
+                                   Maximum="1"
+                                   Foreground="White"
+                                   Background="#33FFFFFF" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="DownloadUpdateButton"
+                            Content="دانلود نسخه جدید"
+                            Click="DownloadUpdate_Click"
+                            Padding="14,8"
+                            Margin="0,0,8,0"
+                            Background="White"
+                            Foreground="{DynamicResource AccentBrush}"
+                            BorderThickness="0"
+                            FontWeight="SemiBold"
+                            Cursor="Hand" />
+                    <Button x:Name="DismissUpdateButton"
+                            Content="بعداً"
+                            Click="DismissUpdate_Click"
+                            Padding="14,8"
+                            Style="{StaticResource SecondaryButton}"
+                            Background="#22FFFFFF"
+                            Foreground="White"
+                            BorderBrush="#44FFFFFF" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <!-- Main content -->
-        <Grid Grid.Row="1" Margin="20,16,20,0">
+        <Grid Grid.Row="2" Margin="20,16,20,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="300" />
                 <ColumnDefinition Width="16" />
@@ -295,7 +352,7 @@
         </Grid>
 
         <!-- Log panel -->
-        <Border Grid.Row="2" Margin="20,12,20,0" Style="{StaticResource CardBorder}" Padding="12">
+        <Border Grid.Row="3" Margin="20,12,20,0" Style="{StaticResource CardBorder}" Padding="12">
             <DockPanel>
                 <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
                     <TextBlock Text="لاگ اجرا" Style="{StaticResource SectionTitle}" VerticalAlignment="Center" />
@@ -322,7 +379,7 @@
         </Border>
 
         <!-- Footer actions -->
-        <Border Grid.Row="3"
+        <Border Grid.Row="4"
                 Background="{DynamicResource SurfaceBrush}"
                 BorderBrush="{DynamicResource BorderBrushTheme}"
                 BorderThickness="0,1,0,0"
@@ -363,7 +420,7 @@
         </Border>
 
         <!-- Copyright -->
-        <Border Grid.Row="4"
+        <Border Grid.Row="5"
                 Background="{DynamicResource AppBackgroundBrush}"
                 Padding="0,0,0,10">
             <TextBlock Text="Design and Development by Hossein Zahedi"

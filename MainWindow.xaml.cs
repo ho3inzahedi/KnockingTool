@@ -15,6 +15,8 @@ public partial class MainWindow : Window
     private readonly AppSettings _appSettings;
     private readonly PersistenceService _persistence;
     private CancellationTokenSource? _runCts;
+    private UpdateInfo? _pendingUpdate;
+    private CancellationTokenSource? _downloadCts;
 
     public MainWindow(PersistenceService persistence, IEnumerable<KnockNode> loadedNodes, RepeatSettings loadedRepeat, AppSettings appSettings)
     {
@@ -43,7 +45,15 @@ public partial class MainWindow : Window
 
         UpdateThemeToggleButton();
         Log("برنامه آماده است.");
+        Log($"نسخه فعلی: {UpdateService.CurrentVersion}");
         Log($"ذخیره خودکار: {_persistence.ConfigPath}");
+
+        Loaded += MainWindow_Loaded;
+    }
+
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        await CheckForUpdatesAsync();
     }
 
     private void CopyrightLink_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -297,5 +307,115 @@ public partial class MainWindow : Window
             RunSelectedButton.IsEnabled = !isRunning;
             RunAllButton.IsEnabled = !isRunning;
         });
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        try
+        {
+            var update = await UpdateService.CheckForUpdateAsync();
+            if (update is null)
+            {
+                return;
+            }
+
+            if (string.Equals(_appSettings.DismissedUpdateVersion, update.TagName, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            _pendingUpdate = update;
+            Dispatcher.Invoke(() =>
+            {
+                UpdateBannerTitle.Text = $"نسخه جدید {update.Version} در دسترس است";
+                UpdateBannerSubtitle.Text =
+                    $"نسخه فعلی شما: {UpdateService.CurrentVersion} — برای دریافت آخرین بهبودها دانلود کنید.";
+                UpdateBanner.Visibility = Visibility.Visible;
+            });
+            Log($"به‌روزرسانی جدید یافت شد: {update.TagName}");
+        }
+        catch (Exception ex)
+        {
+            Log($"بررسی به‌روزرسانی ناموفق بود: {ex.Message}");
+        }
+    }
+
+    private async void DownloadUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_pendingUpdate is null)
+        {
+            return;
+        }
+
+        _downloadCts?.Cancel();
+        _downloadCts = new CancellationTokenSource();
+        var token = _downloadCts.Token;
+
+        DownloadUpdateButton.IsEnabled = false;
+        DismissUpdateButton.IsEnabled = false;
+        UpdateProgressBar.Visibility = Visibility.Visible;
+        UpdateProgressBar.Value = 0;
+
+        var progress = new Progress<double>(value =>
+        {
+            Dispatcher.Invoke(() =>
+            {
+                UpdateProgressBar.Value = value;
+                UpdateBannerSubtitle.Text = $"در حال دانلود... {value:P0}";
+            });
+        });
+
+        try
+        {
+            var filePath = await UpdateService.DownloadUpdateAsync(_pendingUpdate, progress, token);
+            Log($"نسخه جدید دانلود شد: {filePath}");
+
+            var result = MessageBox.Show(
+                $"نسخه {_pendingUpdate.Version} با موفقیت دانلود شد.\n\n" +
+                "برای نصب، برنامه را ببندید و فایل جدید را جایگزین نسخه فعلی کنید.\n\n" +
+                "آیا پوشه دانلود باز شود؟",
+                "دانلود کامل شد",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{filePath}\"") { UseShellExecute = true });
+            }
+
+            UpdateBanner.Visibility = Visibility.Collapsed;
+            _pendingUpdate = null;
+        }
+        catch (OperationCanceledException)
+        {
+            Log("دانلود به‌روزرسانی لغو شد.");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"خطا در دانلود:\n{ex.Message}", "خطا", MessageBoxButton.OK, MessageBoxImage.Error);
+            Log($"خطا در دانلود به‌روزرسانی: {ex.Message}");
+        }
+        finally
+        {
+            DownloadUpdateButton.IsEnabled = true;
+            DismissUpdateButton.IsEnabled = true;
+            UpdateProgressBar.Visibility = Visibility.Collapsed;
+            if (_pendingUpdate is not null)
+            {
+                UpdateBannerSubtitle.Text =
+                    $"نسخه فعلی شما: {UpdateService.CurrentVersion} — برای دریافت آخرین بهبودها دانلود کنید.";
+            }
+        }
+    }
+
+    private void DismissUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        if (_pendingUpdate is not null)
+        {
+            _appSettings.DismissedUpdateVersion = _pendingUpdate.TagName;
+            _persistence.SaveNow();
+        }
+
+        UpdateBanner.Visibility = Visibility.Collapsed;
     }
 }

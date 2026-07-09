@@ -8,7 +8,7 @@
 
 فایل اجرایی (`.exe`) را از بخش **Releases** در GitHub دانلود کنید:
 
-👉 **[دانلود v1.0.2 (آخرین نسخه پایدار)](https://github.com/ho3inzahedi/KnockingTool/releases/tag/v1.0.2)**
+👉 **[دانلود v1.0.3 (آخرین نسخه)](https://github.com/ho3inzahedi/KnockingTool/releases/tag/v1.0.3)**
 
 | فایل | توضیح |
 |------|--------|
