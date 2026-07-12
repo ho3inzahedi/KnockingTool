@@ -14,6 +14,15 @@ public class ProtocolPortEnabledConverter : IValueConverter
         => throw new NotSupportedException();
 }
 
+public class ProtocolPayloadEnabledConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is KnockProtocol protocol && protocol != KnockProtocol.Tcp;
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => throw new NotSupportedException();
+}
+
 public class PortDisplayConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)

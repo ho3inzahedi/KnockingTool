@@ -8,6 +8,8 @@ public class KnockStep : INotifyPropertyChanged
     private KnockProtocol _protocol = KnockProtocol.Tcp;
     private int _port = 80;
     private int _payloadSize = 32;
+    private PayloadMode _payloadMode = PayloadMode.Zero;
+    private string _payloadContent = string.Empty;
     private bool _includeIpHeader;
     private int _delayMs = 500;
 
@@ -29,6 +31,18 @@ public class KnockStep : INotifyPropertyChanged
     {
         get => _payloadSize;
         set => SetField(ref _payloadSize, value);
+    }
+
+    public PayloadMode PayloadMode
+    {
+        get => _payloadMode;
+        set => SetField(ref _payloadMode, value);
+    }
+
+    public string PayloadContent
+    {
+        get => _payloadContent;
+        set => SetField(ref _payloadContent, value);
     }
 
     public bool IncludeIpHeader

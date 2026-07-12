@@ -8,7 +8,7 @@
 
 فایل اجرایی (`.exe`) را از بخش **Releases** در GitHub دانلود کنید:
 
-👉 **[دانلود v1.0.4 (آخرین نسخه)](https://github.com/ho3inzahedi/KnockingTool/releases/tag/v1.0.4)**
+👉 **[دانلود v1.1.0 (آخرین نسخه)](https://github.com/ho3inzahedi/KnockingTool/releases/tag/v1.1.0)**
 
 | فایل | توضیح |
 |------|--------|
@@ -67,11 +67,15 @@
 | **Protocol** | Icmp / Tcp / Udp | همان |
 | **Port** | — (کاربرد ندارد) | پورت مقصد |
 | **Size** | اندازه payload (بایت) | اندازه payload (UDP) |
+| **Mode** | نوع محتوا: Zero / Random / Text / Hex | همان (UDP) |
+| **Content** | متن یا هگز payload | همان (UDP) |
 | **Hdr 28B** | هدر IP+ICMP با raw socket | — |
 | **Delay** | تأخیر تا مرحله بعد (ms) | همان |
 
 #### ICMP
 - **Size:** اندازه داده (payload) بسته
+- **Mode:** نوع محتوا — `Zero` (صفر)، `Random` (تصادفی)، `Text` (متن)، `Hex` (هگز)
+- **Content:** مقدار payload برای حالت‌های Text و Hex (مثلاً `knock1` یا `DE AD BE EF`)
 - **Hdr 28B:** اگر فعال باشد، بسته با هدر IP (20 بایت) + ICMP (8 بایت) ارسال می‌شود
 
 #### TCP
@@ -79,6 +83,7 @@
 
 #### UDP
 - یک **datagram** به پورت و با اندازه مشخص ارسال می‌شود
+- **Mode** و **Content** مانند ICMP برای تعیین محتوای دقیق datagram
 
 ---
 

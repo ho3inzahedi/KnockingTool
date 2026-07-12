@@ -8,14 +8,15 @@
         mc:Ignorable="d"
         Title="Knocking Tool"
         Icon="/Assets/app.ico"
-        Height="820" Width="1180"
-        MinHeight="700" MinWidth="960"
+        Height="820" Width="1320"
+        MinHeight="700" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource AppBackgroundBrush}"
         FontFamily="Segoe UI">
     <Window.Resources>
         <conv:IntStringConverter x:Key="IntString" />
         <conv:ProtocolPortEnabledConverter x:Key="ProtocolPortEnabled" />
+        <conv:ProtocolPayloadEnabledConverter x:Key="ProtocolPayloadEnabled" />
 
         <DataTemplate x:Key="NodeItemTemplate">
             <StackPanel>
@@ -297,8 +298,8 @@
 
                                     <DataGridTextColumn Header="Size"
                                                         Binding="{Binding PayloadSize}"
-                                                        Width="90"
-                                                        MinWidth="80">
+                                                        Width="70"
+                                                        MinWidth="60">
                                         <DataGridTextColumn.ElementStyle>
                                             <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellText}" />
                                         </DataGridTextColumn.ElementStyle>
@@ -309,6 +310,85 @@
                                             </Style>
                                         </DataGridTextColumn.EditingElementStyle>
                                     </DataGridTextColumn>
+
+                                    <DataGridComboBoxColumn Header="Mode"
+                                                            SelectedItemBinding="{Binding PayloadMode, UpdateSourceTrigger=PropertyChanged}"
+                                                            Width="90"
+                                                            MinWidth="80">
+                                        <DataGridComboBoxColumn.ElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource">
+                                                    <Setter.Value>
+                                                        <x:Array Type="models:PayloadMode">
+                                                            <models:PayloadMode>Zero</models:PayloadMode>
+                                                            <models:PayloadMode>Random</models:PayloadMode>
+                                                            <models:PayloadMode>Text</models:PayloadMode>
+                                                            <models:PayloadMode>Hex</models:PayloadMode>
+                                                        </x:Array>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                                <Setter Property="IsHitTestVisible" Value="False" />
+                                                <Setter Property="Focusable" Value="False" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Protocol}" Value="Tcp">
+                                                        <Setter Property="Opacity" Value="0.45" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </DataGridComboBoxColumn.ElementStyle>
+                                        <DataGridComboBoxColumn.EditingElementStyle>
+                                            <Style TargetType="ComboBox">
+                                                <Setter Property="ItemsSource">
+                                                    <Setter.Value>
+                                                        <x:Array Type="models:PayloadMode">
+                                                            <models:PayloadMode>Zero</models:PayloadMode>
+                                                            <models:PayloadMode>Random</models:PayloadMode>
+                                                            <models:PayloadMode>Text</models:PayloadMode>
+                                                            <models:PayloadMode>Hex</models:PayloadMode>
+                                                        </x:Array>
+                                                    </Setter.Value>
+                                                </Setter>
+                                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                                                <Setter Property="IsEnabled" Value="{Binding Protocol, Converter={StaticResource ProtocolPayloadEnabled}}" />
+                                            </Style>
+                                        </DataGridComboBoxColumn.EditingElementStyle>
+                                    </DataGridComboBoxColumn>
+
+                                    <DataGridTemplateColumn Header="Content" Width="*" MinWidth="120">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock TextTrimming="CharacterEllipsis"
+                                                           ToolTip="{Binding PayloadContent}">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellText}">
+                                                            <Setter Property="Text" Value="{Binding PayloadContent}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Protocol}" Value="Tcp">
+                                                                    <Setter Property="Text" Value="—" />
+                                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding PayloadContent}" Value="">
+                                                                    <Setter Property="Text" Value="" />
+                                                                    <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                        <DataGridTemplateColumn.CellEditingTemplate>
+                                            <DataTemplate>
+                                                <TextBox Text="{Binding PayloadContent, UpdateSourceTrigger=PropertyChanged}"
+                                                         IsEnabled="{Binding Protocol, Converter={StaticResource ProtocolPayloadEnabled}}"
+                                                         HorizontalContentAlignment="Left"
+                                                         VerticalContentAlignment="Center"
+                                                         Padding="4,2" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellEditingTemplate>
+                                    </DataGridTemplateColumn>
 
                                     <DataGridCheckBoxColumn Header="Hdr 28B"
                                                             Binding="{Binding IncludeIpHeader, UpdateSourceTrigger=PropertyChanged}"
@@ -343,7 +423,7 @@
                     <TextBlock Grid.Row="4"
                                Style="{StaticResource HintText}"
                                Margin="0,12,0,0"
-                               Text="ICMP: Size = payload, Hdr 28B = raw socket (IP+ICMP). TCP/UDP: set destination port." />
+                               Text="ICMP/UDP: Size = طول payload، Mode = نوع محتوا (Zero/Random/Text/Hex)، Content = متن یا هگز. TCP: فقط پورت." />
                 </Grid>
             </Border>
         </Grid>

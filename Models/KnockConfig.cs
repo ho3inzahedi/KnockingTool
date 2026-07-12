@@ -20,6 +20,8 @@ public class KnockStepDto
     public KnockProtocol Protocol { get; set; }
     public int Port { get; set; }
     public int PayloadSize { get; set; }
+    public PayloadMode PayloadMode { get; set; }
+    public string PayloadContent { get; set; } = string.Empty;
     public bool IncludeIpHeader { get; set; }
     public int DelayMs { get; set; }
 }

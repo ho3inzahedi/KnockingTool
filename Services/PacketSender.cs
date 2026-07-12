@@ -25,20 +25,23 @@ public static class PacketSender
             return (false, "آدرس IP نامعتبر است");
         }
 
-        var payloadSize = Math.Clamp(step.PayloadSize, 0, 65500);
-
         try
         {
+            var buffer = BuildPayload(step, 65500);
+
             if (step.IncludeIpHeader)
             {
-                return await Task.Run(() => SendIcmpWithRawHeader(ipAddress, payloadSize));
+                return await Task.Run(() => SendIcmpWithRawHeader(ipAddress, buffer));
             }
 
             using var ping = new Ping();
-            var buffer = payloadSize > 0 ? new byte[payloadSize] : Array.Empty<byte>();
             var reply = await ping.SendPingAsync(ipAddress, 3000, buffer);
             var success = reply.Status == IPStatus.Success || reply.Status == IPStatus.TtlExpired;
             return (success, $"ICMP Echo — وضعیت: {reply.Status}, RTT: {reply.RoundtripTime}ms");
+        }
+        catch (FormatException ex)
+        {
+            return (false, $"محتوای هگز نامعتبر: {ex.Message}");
         }
         catch (Exception ex)
         {
@@ -46,20 +49,21 @@ public static class PacketSender
         }
     }
 
-    private static (bool Success, string Message) SendIcmpWithRawHeader(IPAddress destination, int payloadSize)
+    private static (bool Success, string Message) SendIcmpWithRawHeader(IPAddress destination, byte[] payload)
     {
         using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Raw, ProtocolType.Icmp);
         socket.SetSocketOption(SocketOptionLevel.IP, SocketOptionName.HeaderIncluded, true);
 
-        var packet = BuildIpIcmpPacket(destination, payloadSize);
+        var packet = BuildIpIcmpPacket(destination, payload);
         socket.SendTo(packet, new IPEndPoint(destination, 0));
-        return (true, $"ICMP با هدر IP+ICMP (28 بایت) + payload {payloadSize} بایت ارسال شد");
+        return (true, $"ICMP با هدر IP+ICMP (28 بایت) + payload {payload.Length} بایت ارسال شد");
     }
 
-    private static byte[] BuildIpIcmpPacket(IPAddress destination, int payloadSize)
+    private static byte[] BuildIpIcmpPacket(IPAddress destination, byte[] payload)
     {
         const int ipHeaderSize = 20;
         const int icmpHeaderSize = 8;
+        var payloadSize = payload.Length;
         var totalLength = (ushort)(ipHeaderSize + icmpHeaderSize + payloadSize);
         var packet = new byte[totalLength];
 
@@ -96,7 +100,7 @@ public static class PacketSender
 
         if (payloadSize > 0)
         {
-            Random.Shared.NextBytes(packet.AsSpan(icmpOffset + icmpHeaderSize, payloadSize));
+            Buffer.BlockCopy(payload, 0, packet, icmpOffset + icmpHeaderSize, payloadSize);
         }
 
         var icmpChecksum = ComputeChecksum(packet.AsSpan(icmpOffset, icmpHeaderSize + payloadSize));
@@ -182,18 +186,29 @@ public static class PacketSender
         }
 
         var port = Math.Clamp(step.Port, 1, 65535);
-        var payloadSize = Math.Clamp(step.PayloadSize, 0, 65507);
-        var data = payloadSize > 0 ? new byte[payloadSize] : new byte[] { 0x00 };
 
         try
         {
+            var data = BuildPayload(step, 65507);
+            if (data.Length == 0)
+            {
+                data = new byte[] { 0x00 };
+            }
+
             using var client = new UdpClient();
             await client.SendAsync(data, data.Length, new IPEndPoint(ipAddress, port));
             return (true, $"UDP {data.Length} بایت به {destinationIp}:{port} ارسال شد");
+        }
+        catch (FormatException ex)
+        {
+            return (false, $"محتوای هگز نامعتبر: {ex.Message}");
         }
         catch (Exception ex)
         {
             return (false, $"خطا در UDP: {ex.Message}");
         }
     }
+
+    private static byte[] BuildPayload(KnockStep step, int maxSize)
+        => PayloadBuilder.Build(step.PayloadMode, step.PayloadContent, step.PayloadSize, maxSize);
 }

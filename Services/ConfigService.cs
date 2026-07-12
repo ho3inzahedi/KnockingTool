@@ -27,6 +27,8 @@ public static class ConfigService
                     Protocol = step.Protocol,
                     Port = step.Port,
                     PayloadSize = step.PayloadSize,
+                    PayloadMode = step.PayloadMode,
+                    PayloadContent = step.PayloadContent,
                     IncludeIpHeader = step.IncludeIpHeader,
                     DelayMs = step.DelayMs
                 }).ToList()
@@ -62,6 +64,8 @@ public static class ConfigService
                     Protocol = stepDto.Protocol,
                     Port = stepDto.Port,
                     PayloadSize = stepDto.PayloadSize,
+                    PayloadMode = stepDto.PayloadMode,
+                    PayloadContent = stepDto.PayloadContent,
                     IncludeIpHeader = stepDto.IncludeIpHeader,
                     DelayMs = stepDto.DelayMs
                 });
